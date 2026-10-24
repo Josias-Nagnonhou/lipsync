@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LipSync</title>
+<meta name="description" content="Fais parler une photo ou une vidéo avec ta propre voix.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23241c30'/%3E%3Cpath d='M7 16h2M11 11v10M15 7v18M19 12v8M23 9v14M27 15v2' stroke='%23f2b33d' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="./">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 16h2M11 11v10M15 7v18M19 12v8M23 9v14M27 15v2"/></svg>
+    LipSync
+  </a>
+  <button class="moteur" id="moteurPill" type="button" aria-live="polite">
+    <span class="dot"></span><span id="moteurTexte">Recherche du moteur…</span>
+  </button>
+</header>
+
+<main>
+  <!-- Moteur éteint -->
+  <section class="eteint" id="vueEteint" hidden>
+    <div class="eteint-onde" aria-hidden="true"></div>
+    <h1>Allume le moteur pour commencer</h1>
+    <p class="lead">Le moteur, c'est la carte graphique gratuite de Google qui fait parler tes visages. Il s'allume en un clic et revient ici tout seul.</p>
+    <ol class="etapes">
+      <li><b>Ouvre le moteur</b> avec le bouton ci-dessous.</li>
+      <li>Dans la page Google, clique sur <b>▶</b> puis autorise Google Drive.</li>
+      <li>Après quelques minutes, clique sur le lien <b>« Ouvrir LipSync »</b> qui apparaît. Tu reviens ici, prêt à créer.</li>
+    </ol>
+    <a class="btn btn-principal" id="lienColab" target="_blank" rel="noopener">Ouvrir le moteur</a>
+    <p class="aide">La première fois, choisis aussi <b>Exécution → Modifier le type d'exécution → GPU T4</b> avant de cliquer sur ▶.</p>
+    <details class="manuel">
+      <summary>J'ai une adresse de moteur</summary>
+      <form id="formAdresse">
+        <input id="champAdresse" type="url" placeholder="https://….trycloudflare.com" required>
+        <button class="btn" type="submit">Connecter</button>
+      </form>
+    </details>
+  </section>
+
+  <!-- Moteur allumé -->
+  <section id="vueApp" hidden>
+    <nav class="onglets" role="tablist">
+      <button role="tab" class="onglet" data-vue="creer" aria-selected="true">Créer une vidéo</button>
+      <button role="tab" class="onglet" data-vue="videos" aria-selected="false">Mes vidéos <span id="compte" class="compte"></span></button>
+    </nav>
+
+    <form id="vueCreer" class="creer" novalidate>
+      <div class="studio">
+        <label class="zone zone-visage" id="zoneVisage">
+          <input type="file" id="fichierVisage" accept="image/*,video/*" hidden>
+          <div class="vide">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="18" r="8"/><path d="M10 40c2-8 8-12 14-12s12 4 14 12"/></svg>
+            <strong>Le visage</strong>
+            <span>Une photo ou une vidéo, visage bien de face</span>
+          </div>
+          <div class="apercu" id="apercuVisage"></div>
+          <button type="button" class="changer" data-cible="fichierVisage">Changer</button>
+        </label>
+
+        <label class="zone zone-voix" id="zoneVoix">
+          <input type="file" id="fichierVoix" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg" hidden>
+          <div class="vide">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 24h3M13 16v16M20 8v32M27 14v20M34 10v28M41 20v8"/></svg>
+            <strong>La voix</strong>
+            <span>Ton audio : mp3, wav, m4a… jusqu'à 30 minutes et plus</span>
+          </div>
+          <div class="voix-pleine">
+            <div class="voix-tete">
+              <span id="nomVoix"></span>
+              <span id="dureeVoix" class="duree"></span>
+            </div>
+            <canvas id="ondeVoix" height="120"></canvas>
+            <audio id="lecteurVoix" controls preload="metadata"></audio>
+          </div>
+          <button type="button" class="changer" data-cible="fichierVoix">Changer</button>
+        </label>
+      </div>
+
+      <div class="ligne-titre">
+        <label for="titre">Nom de la vidéo</label>
+        <input id="titre" type="text" maxlength="80" placeholder="Ex. Psaume 91, épisode 12" autocomplete="off">
+      </div>
+
+      <details class="reglages">
+        <summary>Réglages</summary>
+        <div class="grille-reglages">
+          <fieldset>
+            <legend>Résolution</legend>
+            <div class="choix">
+              <label><input type="radio" name="resolution" value="480"><span>480p<small>plus rapide</small></span></label>
+              <label><input type="radio" name="resolution" value="720" checked><span>720p<small>conseillé</small></span></label>
+              <label><input type="radio" name="resolution" value="1080"><span>1080p<small>plus lent</small></span></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Qualité</legend>
+            <div class="choix">
+              <label><input type="radio" name="qualite" value="rapide" checked><span>Rapide<small>20 passes</small></span></label>
+              <label><input type="radio" name="qualite" value="qualite"><span>Soignée<small>30 passes, plus lent</small></span></label>
+            </div>
+          </fieldset>
+          <div class="curseur">
+            <label for="precision">Précision des lèvres <output id="valPrecision">1,5</output></label>
+            <input type="range" id="precision" min="1" max="3" step="0.1" value="1.5">
+            <p>Plus haut, la bouche suit plus fort la voix, avec un risque de tremblement.</p>
+          </div>
+          <div class="curseur">
+            <label for="morceau">Taille des passages <output id="valMorceau">30 s</output></label>
+            <input type="range" id="morceau" min="15" max="90" step="5" value="30">
+            <p>Le moteur travaille passage par passage. 30 s est le plus sûr avec la carte gratuite.</p>
+          </div>
+        </div>
+      </details>
+
+      <div class="lancer">
+        <p id="resumeTravail" class="resume">Ajoute un visage et une voix.</p>
+        <button type="submit" class="btn btn-principal" id="btnLancer" disabled>Lancer la vidéo</button>
+      </div>
+      <div class="envoi" id="envoi" hidden>
+        <div class="barre"><i id="barreEnvoi"></i></div>
+        <span id="texteEnvoi">Envoi des fichiers…</span>
+      </div>
+      <p class="erreur" id="erreurCreer" role="alert" hidden></p>
+    </form>
+
+    <section id="vueVideos" class="videos" hidden>
+      <div id="listeVideos"></div>
+      <div class="liste-vide" id="listeVide" hidden>
+        <p>Aucune vidéo pour l'instant.</p>
+        <button class="btn" type="button" data-aller="creer">Créer ta première vidéo</button>
+      </div>
+      <p class="aide pied">Garde la page du moteur ouverte pendant le travail. Tes vidéos sont aussi rangées dans Google Drive, dossier LipSync.</p>
+    </section>
+  </section>
+</main>
+
+<dialog id="lecteur">
+  <div class="lecteur-tete">
+    <strong id="lecteurTitre"></strong>
+    <button type="button" class="fermer" aria-label="Fermer">×</button>
+  </div>
+  <video id="lecteurVideo" controls playsinline></video>
+</dialog>
+
+<template id="modeleVideo">
+  <article class="carte-video">
+    <div class="vignette"><img alt="" loading="lazy"></div>
+    <div class="infos">
+      <h3></h3>
+      <p class="statut"></p>
+      <canvas class="progres" height="44"></canvas>
+      <p class="details"></p>
+    </div>
+    <div class="actions"></div>
+  </article>
+</template>
+
+<script src="app.js"></script>
+</body>
+</html>
