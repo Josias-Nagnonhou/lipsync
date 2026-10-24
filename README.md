@@ -1,11 +1,11 @@
 # LipSync
 
-Synchronisation labiale gratuite : fais parler une photo ou une vidéo avec ton propre audio, même pour des vidéos de 15 à 20 minutes.
+Fais parler une photo ou une vidéo avec ta propre voix, même pour des vidéos de 15 à 20 minutes. Gratuit.
 
-[![Ouvrir dans Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Josias-Nagnonhou/lipsync/blob/main/LipSync.ipynb)
+**Le site : https://lipsync-6cu9.onrender.com**
 
-1. Clique sur le bouton ci-dessus.
-2. Menu **Exécution → Modifier le type d'exécution → GPU T4 → Enregistrer**.
-3. Clique sur **▶**, autorise Google Drive, puis clique sur le lien `https://….gradio.live`.
+Le site te guide : le premier bouton allume le moteur (la carte graphique gratuite de Google Colab), puis tout se fait sur le site. Les vidéos sont aussi rangées dans Google Drive, dossier LipSync.
 
-Basé sur [LatentSync](https://github.com/bytedance/LatentSync) (ByteDance, licence Apache 2.0).
+- `site/` : le site (hébergé sur Render)
+- `moteur/` : le moteur qui tourne dans Colab, basé sur [LatentSync](https://github.com/bytedance/LatentSync) (ByteDance, licence Apache 2.0)
+- `LipSync.ipynb` : la page Colab qui allume le moteur
